@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavra Secreta - Layout Centralizado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="menu-inicial">
+        <h1>Palavra Secreta</h1>
+        <div class="dificuldade-container" style="margin-bottom: 20px;">
+            <button class="btn-dif" onclick="setDificuldade(10, this)" style="padding:10px; cursor:pointer;">FÁCIL</button>
+            <button class="btn-dif" onclick="setDificuldade(6, this)" style="padding:10px; cursor:pointer; background:#2fa35bff; color:white;">NORMAL</button>
+            <button class="btn-dif" onclick="setDificuldade(4, this)" style="padding:10px; cursor:pointer;">DIFÍCIL</button>
+        </div>
+        <button id="btn-start" onclick="startGame()" style="padding:15px 40px; background:#2fa35bff; color:white; border:none; border-radius:8px; cursor:pointer; font-size:1.2rem;">JOGAR</button>
+    </div>
+
+    <div id="modal-confirm">
+        <div class="modal-content">
+            <h3>Trocar palavra?</h3>
+            <p>Os pontos ficam, mas o combo de acertos será zerado.</p>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+                <button onclick="confirmarReset()" style="background:var(--cor-perigo); color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Sim, Resetar</button>
+                <button onclick="fecharModal()" style="padding:10px 20px; border:none; border-radius:5px; cursor:pointer; background:#ccc;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-container">
+        <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.8rem; cursor:pointer;">⚙️</button>
+        <div id="settings-menu">
+            <button onclick="abrirModalReset()">🔄 Trocar Palavra</button>
+            <button onclick="location.reload()">⬅️ Menu Inicial</button>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <div>🕒 <span id="timer">00:00</span></div>
+        <div>🏆 Pontos: <span id="score">0</span></div>
+        <div>🔥 Combo: <span id="streak">0</span></div>
+    </div>
+
+    <div id="message" style="height: 60px; font-weight: bold; text-align: center; font-size: 1.2rem;"></div>
+
+    <div class="game-wrapper">
+        <div id="game-board"></div>
+
+        <div id="historico-lateral">
+            <h3 style="margin-top:0; font-size:0.9rem; text-align:center; border-bottom:1px solid #eee;">HISTÓRICO</h3>
+            <div id="lista-historico"></div>
+        </div>
+    </div>
+
+    <div id="keyboard"></div>
+
+    <button id="btn-next" class="btn-final" style="background:#2fa35bff;" onclick="initGame()">PRÓXIMA PALAVRA ➔</button>
+    <button id="btn-lose-menu" class="btn-final" style="background:var(--cor-perigo);" onclick="location.reload()">VOLTAR AO MENU</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
