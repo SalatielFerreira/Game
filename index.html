@@ -30,24 +30,31 @@
         </div>
     </div>
 
-    <div id="status-bar">
-        <div>🕒 <span id="timer">00:00</span></div>
-        <div>🏆 Pontos: <span id="score">0</span></div>
-        <div>🔥 Combo: <span id="streak">0</span></div>
-    </div>
-
-    <div id="settings-container">
-        <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.8rem; cursor:pointer;">⚙️</button>
-        <div id="settings-menu">
-            <button onclick="abrirModalReset()"><h3>🔄 Novo Jogo</h3></button>
-            <button onclick="voltarAoMenu()"><h3>⬅️ Menu Inicial</h3></button>
+    <div class="header-container">
+        <div id="status-bar">
+            <div>🕒 <span id="timer">00:00</span></div>
+            <div>Pontos 🏆 <span id="score">0</span></div>
+            <div>🔥 <span id="streak">0</span></div>
+        </div>
+        <div id="settings-container">
+            <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; padding:0;">⚙️</button>
+            <div id="settings-menu">
+                <button onclick="abrirModalReset()"><h3>🔄 Novo Jogo</h3></button>
+                <button onclick="voltarAoMenu()"><h3>⬅️ Menu Inicial</h3></button>
+            </div>
         </div>
     </div>
 
-    <div id="message" style="height: 40px; margin-top: 10px; font-weight: bold; color: #333;"></div>
+    <div id="message"></div>
 
     <div class="game-wrapper">
         <div id="game-board"></div>
+
+        <div class="final-actions">
+            <button id="btn-next" class="btn-final" style="background:var(--cor-correta);" onclick="proximaPalavra()">PRÓXIMA PALAVRA</button>
+            <button id="btn-lose-menu" class="btn-final" style="background:var(--cor-perigo);" onclick="voltarAoMenu()">VOLTAR AO MENU</button>
+        </div>
+
         <div id="historico-lateral">
             <h3 style="margin-top:0; font-size:0.9rem; text-align:center; border-bottom:1px solid #d1d1d1;">HISTÓRICO</h3>
             <div id="lista-historico"></div>
@@ -55,9 +62,6 @@
     </div>
 
     <div id="keyboard"></div>
-
-    <button id="btn-next" class="btn-final" style="background:var(--cor-correta);" onclick="proximaPalavra()">PRÓXIMA PALAVRA</button>
-    <button id="btn-lose-menu" class="btn-final" style="background:var(--cor-perigo);" onclick="voltarAoMenu()">VOLTAR AO MENU</button>
 
     <script src="script.js"></script>
 </body>
