@@ -1,3 +1,4 @@
+// Banco de dados de palavras do jogo
 const listaPalavras = [
   "TERMO","JOGAR","NOITE","SAGAZ","PODER","MUNDO","IDEIA","LIVRO","FESTA","BRAVO",
   "PORTA","TEMPO","VALOR","CORPO","CAMPO","CHAVE","PLANO","SONHO","AREIA","FOGO",
@@ -152,148 +153,135 @@ const listaPalavras = [
   "ZEBRA","ZELOS","ZEROS","ZINCO","ZORRA","ZUMBI"
 ];
 
+// Variáveis de controle de estado do jogo
 let palavraSecreta = "", tentativaAtual = 0, letraAtual = 0, palpiteAtual = "";
-let tempoSegundos = 0, intervaloTimer, jogoAtivo = false, maxTentativas = 6, scoreTotal = 0, acertosSeguidos = 0;
+let tempoSegundos = 0, startTime = null, intervaloTimer, jogoAtivo = false, maxTentativas = 6, scoreTotal = 0, acertosSeguidos = 0;
 
+// Salva o estado atual no armazenamento do navegador (LocalStorage)
 function salvarDados() {
-    const estado = { scoreTotal, acertosSeguidos, maxTentativas, palavraSecreta, tentativaAtual, letraAtual, palpiteAtual, tempoSegundos, jogoAtivo, historicoHTML: document.getElementById('lista-historico').innerHTML, tabuleiroHTML: document.getElementById('game-board').innerHTML, jogoEmAndamento: localStorage.getItem('jogoEmAndamento') };
+    const estado = { scoreTotal, acertosSeguidos, maxTentativas, palavraSecreta, tentativaAtual, letraAtual, palpiteAtual, tempoSegundos, startTime: localStorage.getItem('startTime'), jogoAtivo, historicoHTML: document.getElementById('lista-historico').innerHTML, tabuleiroHTML: document.getElementById('game-board').innerHTML, jogoEmAndamento: localStorage.getItem('jogoEmAndamento') };
     localStorage.setItem('palavraSecretaData', JSON.stringify(estado));
 }
 
+// Recupera dados salvos ao abrir a página
 function carregarDados() {
     const salvo = JSON.parse(localStorage.getItem('palavraSecretaData'));
     if (salvo) {
         scoreTotal = salvo.scoreTotal; acertosSeguidos = salvo.acertosSeguidos; maxTentativas = salvo.maxTentativas;
         document.getElementById('score').innerText = scoreTotal; document.getElementById('streak').innerText = acertosSeguidos;
         document.getElementById('lista-historico').innerHTML = salvo.historicoHTML;
+        document.querySelectorAll('.btn-dif').forEach(b => b.classList.remove('active'));
+        if(maxTentativas == 10) document.getElementById('dif-facil').classList.add('active');
+        else if(maxTentativas == 4) document.getElementById('dif-dificil').classList.add('active');
+        else document.getElementById('dif-normal').classList.add('active');
+        
         if (salvo.jogoEmAndamento === 'true') {
             document.getElementById('menu-inicial').style.display = "none";
             palavraSecreta = salvo.palavraSecreta; tentativaAtual = salvo.tentativaAtual; letraAtual = salvo.letraAtual; palpiteAtual = salvo.palpiteAtual; tempoSegundos = salvo.tempoSegundos; jogoAtivo = salvo.jogoAtivo;
             document.getElementById('game-board').innerHTML = salvo.tabuleiroHTML;
-            document.querySelectorAll('.tile').forEach(tile => {
-                const parts = tile.id.split('-');
-                tile.onclick = () => selecionarTile(parseInt(parts[1]), parseInt(parts[2]));
-            });
+            // Reatribui eventos de clique após recarregar HTML do tabuleiro
+            document.querySelectorAll('.tile').forEach(tile => { const parts = tile.id.split('-'); tile.onclick = () => selecionarTile(parseInt(parts[1]), parseInt(parts[2])); });
             gerarTeclado(); sincronizarTeclado(); continuarTimer(); atualizarDestaque();
             if (!jogoAtivo) mostrarBotoesFinais(palpiteAtual === palavraSecreta);
         }
     }
 }
 
+// Inicia uma sessão de jogo zerada
 function startGame() { localStorage.setItem('jogoEmAndamento', 'true'); document.getElementById('menu-inicial').style.display = "none"; document.getElementById('lista-historico').innerHTML = ""; scoreTotal = 0; acertosSeguidos = 0; document.getElementById('score').innerText = "0"; document.getElementById('streak').innerText = "0"; initGame(); }
 
+// Inicializa uma nova rodada (palavra nova)
 function initGame() {
     palavraSecreta = listaPalavras[Math.floor(Math.random() * listaPalavras.length)].toUpperCase();
-    tentativaAtual = 0; letraAtual = 0; palpiteAtual = ""; jogoAtivo = true; tempoSegundos = 0;
-    document.getElementById('message').innerHTML = "";
-    document.getElementById('btn-next').style.display = "none";
-    document.getElementById('btn-lose-menu').style.display = "none";
+    tentativaAtual = 0; letraAtual = 0; palpiteAtual = ""; jogoAtivo = true; startTime = Date.now(); localStorage.setItem('startTime', startTime); tempoSegundos = 0;
+    document.getElementById('message').innerHTML = ""; document.getElementById('btn-next').style.display = "none"; document.getElementById('btn-lose-menu').style.display = "none";
     const board = document.getElementById('game-board'); board.innerHTML = "";
+    // Cria os quadrados do tabuleiro dinamicamente com base nas tentativas permitidas
     for (let i = 0; i < maxTentativas; i++) {
         let row = document.createElement('div'); row.className = 'row';
-        for (let j = 0; j < 5; j++) {
-            let tile = document.createElement('div'); tile.className = 'tile';
-            tile.id = `tile-${i}-${j}`; tile.onclick = () => selecionarTile(i, j);
-            row.appendChild(tile);
-        }
+        for (let j = 0; j < 5; j++) { let tile = document.createElement('div'); tile.className = 'tile'; tile.id = `tile-${i}-${j}`; tile.onclick = () => selecionarTile(i, j); row.appendChild(tile); }
         board.appendChild(row);
     }
     gerarTeclado(); continuarTimer(); atualizarDestaque(); salvarDados();
 }
 
+// Seleção manual de qual letra preencher
 function selecionarTile(r, c) { if (!jogoAtivo || r !== tentativaAtual) return; letraAtual = c; atualizarDestaque(); }
-function atualizarDestaque() { 
-    document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected')); 
-    if (jogoAtivo) {
-        const tileAtiva = document.getElementById(`tile-${tentativaAtual}-${letraAtual}`); 
-        if (tileAtiva) tileAtiva.classList.add('selected'); 
-    }
-}
 
+// Atualiza visualmente qual quadrado está selecionado
+function atualizarDestaque() { document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected')); if (jogoAtivo) { const tileAtiva = document.getElementById(`tile-${tentativaAtual}-${letraAtual}`); if (tileAtiva) tileAtiva.classList.add('selected'); } }
+
+// Processa as teclas pressionadas no teclado virtual
 function lidarComClique(t) {
     if (!jogoAtivo) return;
-    const row = document.querySelectorAll(`#game-board .row`)[tentativaAtual];
-    const tiles = row.children;
+    const row = document.querySelectorAll(`#game-board .row`)[tentativaAtual]; const tiles = row.children;
     if (t === "Apagar") { tiles[letraAtual].innerText = ""; if (letraAtual > 0) letraAtual--; }
     else if (t === "Enviar") {
         let p = ""; for(let i=0; i<5; i++) p += tiles[i].innerText;
         if (p.length === 5) { palpiteAtual = p; validarPalpite(); }
-        else { 
-            const m = document.getElementById('message');
-            m.innerText = "Complete a palavra!"; 
-            setTimeout(() => m.innerText = "", 1500); 
-        }
+        else { const m = document.getElementById('message'); m.innerText = "Complete a palavra!"; setTimeout(() => m.innerText = "", 1500); }
     } else if (t.length === 1) { tiles[letraAtual].innerText = t; if (letraAtual < 4) letraAtual++; }
     atualizarDestaque(); salvarDados();
 }
 
+// Lógica principal: compara o palpite do usuário com a palavra secreta
 function validarPalpite() {
     let sec = palavraSecreta.split(''), pal = palpiteAtual.split('');
-    const row = document.querySelectorAll(`#game-board .row`)[tentativaAtual];
-    const tiles = row.children;
+    const row = document.querySelectorAll(`#game-board .row`)[tentativaAtual]; const tiles = row.children;
     
     if (palpiteAtual === palavraSecreta) {
-        jogoAtivo = false;
-        atualizarDestaque();
-        for (let i = 0; i < 5; i++) {
-            tiles[i].className = 'tile correct';
-            atualizarTecla(pal[i], 'correct');
-        }
+        jogoAtivo = false; tempoSegundos = Math.floor((Date.now() - parseInt(localStorage.getItem('startTime'))) / 1000);
+        atualizarDestaque(); for (let i = 0; i < 5; i++) { tiles[i].className = 'tile correct'; atualizarTecla(pal[i], 'correct'); }
         vitoria();
     } else {
-        for (let i = 0; i < 5; i++) {
-            if (pal[i] === sec[i]) {
-                tiles[i].classList.add('correct');
-                atualizarTecla(pal[i], 'correct');
-                sec[i] = null; pal[i] = null;
-            }
-        }
-        for (let i = 0; i < 5; i++) {
-            if (pal[i]) {
-                let idx = sec.indexOf(pal[i]);
-                if (idx > -1) {
-                    tiles[i].classList.add('present');
-                    atualizarTecla(pal[i], 'present');
-                    sec[idx] = null;
-                } else {
-                    tiles[i].classList.add('absent');
-                    atualizarTecla(pal[i], 'absent');
-                }
-            }
-        }
-        tentativaAtual++; letraAtual = 0; palpiteAtual = ""; 
-        if (tentativaAtual === maxTentativas) derrota(); else atualizarDestaque();
+        // Primeira passada: marca letras corretas na posição correta
+        for (let i = 0; i < 5; i++) { if (pal[i] === sec[i]) { tiles[i].classList.add('correct'); atualizarTecla(pal[i], 'correct'); sec[i] = null; pal[i] = null; } }
+        // Segunda passada: marca letras que existem mas em posição errada ou ausentes
+        for (let i = 0; i < 5; i++) { if (pal[i]) { let idx = sec.indexOf(pal[i]); if (idx > -1) { tiles[i].classList.add('present'); atualizarTecla(pal[i], 'present'); sec[idx] = null; } else { tiles[i].classList.add('absent'); atualizarTecla(pal[i], 'absent'); } } }
+        tentativaAtual++; letraAtual = 0; palpiteAtual = ""; if (tentativaAtual === maxTentativas) derrota(); else atualizarDestaque();
     }
     salvarDados();
 }
 
+// Funções de finalização da rodada
 function vitoria() { scoreTotal += (maxTentativas - tentativaAtual) * 100 + 100; acertosSeguidos++; registrarNoHistorico(true); mostrarBotoesFinais(true); }
-function derrota() { jogoAtivo = false; acertosSeguidos = 0; registrarNoHistorico(false); mostrarBotoesFinais(false); }
+function derrota() { jogoAtivo = false; tempoSegundos = Math.floor((Date.now() - parseInt(localStorage.getItem('startTime'))) / 1000); acertosSeguidos = 0; registrarNoHistorico(false); mostrarBotoesFinais(false); }
 
+// Exibe mensagem de vitória/derrota e botões de ação
 function mostrarBotoesFinais(v) {
     const m = document.getElementById('message');
-    if (v) {
-        m.innerHTML = `<div class="msg-status" style="color:var(--cor-correta)">VENCEU!</div><div class="msg-palavra">Palavra Chave: ${palavraSecreta}</div>`;
-        document.getElementById('btn-next').style.display = "inline-block";
-    } else {
-        m.innerHTML = `<div class="msg-status" style="color:var(--cor-perigo)">FIM DE JOGO!</div><div class="msg-palavra">Palavra Chave: ${palavraSecreta}</div>`;
-        document.getElementById('btn-lose-menu').style.display = "inline-block";
-    }
-    document.getElementById('score').innerText = scoreTotal;
-    document.getElementById('streak').innerText = acertosSeguidos;
+    if (v) { m.innerHTML = `<div class="msg-status" style="color:var(--cor-correta)">VENCEU!</div><div class="msg-palavra">Palavra Chave: ${palavraSecreta}</div>`; document.getElementById('btn-next').style.display = "inline-block"; }
+    else { m.innerHTML = `<div class="msg-status" style="color:var(--cor-perigo)">FIM DE JOGO!</div><div class="msg-palavra">palavra Chave: ${palavraSecreta}</div>`; document.getElementById('btn-lose-menu').style.display = "inline-block"; }
+    document.getElementById('score').innerText = scoreTotal; document.getElementById('streak').innerText = acertosSeguidos;
 }
 
+// Vai para a próxima palavra mantendo pontos e combo
 function proximaPalavra() { initGame(); }
-function continuarTimer() { clearInterval(intervaloTimer); intervaloTimer = setInterval(() => { if (jogoAtivo) { tempoSegundos++; atualizarDisplayTimer(); } }, 1000); atualizarDisplayTimer(); }
-function atualizarDisplayTimer() { let min = Math.floor(tempoSegundos / 60).toString().padStart(2, '0'); let seg = (tempoSegundos % 60).toString().padStart(2, '0'); document.getElementById('timer').innerText = `${min}:${seg}`; }
+
+// Gerenciamento do cronômetro
+function continuarTimer() { clearInterval(intervaloTimer); const savedStart = localStorage.getItem('startTime'); startTime = savedStart ? parseInt(savedStart) : Date.now(); intervaloTimer = setInterval(() => { if (jogoAtivo) { tempoSegundos = Math.floor((Date.now() - startTime) / 1000); atualizarDisplayTimer(); } }, 1000); atualizarDisplayTimer(); }
+function atualizarDisplayTimer() { let total = jogoAtivo ? Math.floor((Date.now() - startTime) / 1000) : tempoSegundos; let min = Math.floor(total / 60).toString().padStart(2, '0'); let seg = (total % 60).toString().padStart(2, '0'); document.getElementById('timer').innerText = `${min}:${seg}`; }
+
+// Sincroniza as cores das teclas do teclado com o que já foi tentado no tabuleiro
 function sincronizarTeclado() { document.querySelectorAll('.tile').forEach(t => { if (t.classList.contains('correct')) atualizarTecla(t.innerText, 'correct'); else if (t.classList.contains('present')) atualizarTecla(t.innerText, 'present'); else if (t.classList.contains('absent')) atualizarTecla(t.innerText, 'absent'); }); }
 function atualizarTecla(l, c) { let b = document.getElementById(`key-${l}`); if (!b) return; if (c === 'correct') b.className = 'key correct'; else if (c === 'present' && !b.classList.contains('correct')) b.className = 'key present'; else if (c === 'absent' && !b.classList.contains('correct') && !b.classList.contains('present')) b.className = 'key absent'; }
+
+// Renderiza o teclado QWERTY na tela
 function gerarTeclado() { const kb = document.getElementById('keyboard'); kb.innerHTML = ""; const layout = [["Q","W","E","R","T","Y","U","I","O","P"],["A","S","D","F","G","H","J","K","L"],["Enviar","Z","X","C","V","B","N","M","Apagar"]]; layout.forEach(l => { let div = document.createElement('div'); div.className = 'kb-row'; l.forEach(t => { let b = document.createElement('button'); b.className = 'key' + (t.length > 1 ? ' wide' : ''); b.innerText = t; b.id = `key-${t}`; b.onclick = () => lidarComClique(t); div.appendChild(b); }); kb.appendChild(div); }); }
+
+// Adiciona o resultado da partida na lista de histórico
 function registrarNoHistorico(vitoria) { const lista = document.getElementById('lista-historico'); const item = document.createElement('div'); item.className = 'hist-item'; item.innerHTML = `<span class="${vitoria ? 'hist-vitoria' : 'hist-derrota'}">${vitoria ? '✓' : '✗'} ${palavraSecreta}</span><br><small style="color:#666">⏱ ${document.getElementById('timer').innerText} | 🎯 ${tentativaAtual + (vitoria?1:0)}/${maxTentativas}</small>`; lista.prepend(item); }
-function setDificuldade(t, el) { maxTentativas = t; document.querySelectorAll('.btn-dif').forEach(b => { b.style.background="white"; b.style.color="black"; }); el.style.background = "#c9b458"; el.style.color = "white"; salvarDados(); }
-function voltarAoMenu() { localStorage.setItem('jogoEmAndamento', 'false'); salvarDados(); location.reload(); }
-function toggleSettings() { const m = document.getElementById('settings-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-function abrirModalReset() { document.getElementById('modal-confirm').style.display = 'flex'; toggleSettings(); }
+
+// Define as tentativas baseadas no nível escolhido
+function setDificuldade(t, el) { maxTentativas = t; document.querySelectorAll('.btn-dif').forEach(b => b.classList.remove('active')); el.classList.add('active'); salvarDados(); }
+
+// Controle de abertura e fechamento de menus e modais
+function abrirModalReset() { document.getElementById('modal-title').innerText = "Novo Jogo"; document.getElementById('modal-text').innerText = "Isso limpará seu histórico, pontos e combo!"; const btn = document.getElementById('modal-confirm-btn'); btn.onclick = confirmarReset; document.getElementById('modal-confirm').style.display = 'flex'; toggleSettings(); }
+function abrirModalVoltar() { if (!jogoAtivo) { voltarAoMenu(); return; } document.getElementById('modal-title').innerText = "Voltar ao Menu"; document.getElementById('modal-text').innerText = "Você perderá o progresso da rodada atual!"; const btn = document.getElementById('modal-confirm-btn'); btn.onclick = voltarAoMenu; document.getElementById('modal-confirm').style.display = 'flex'; toggleSettings(); }
 function fecharModal() { document.getElementById('modal-confirm').style.display = 'none'; }
 function confirmarReset() { acertosSeguidos = 0; scoreTotal = 0; document.getElementById('score').innerText = "0"; document.getElementById('streak').innerText = "0"; document.getElementById('lista-historico').innerHTML = ""; fecharModal(); initGame(); }
+function voltarAoMenu() { localStorage.setItem('jogoEmAndamento', 'false'); salvarDados(); location.reload(); }
+function toggleSettings() { const m = document.getElementById('settings-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
+
+// Fecha o menu de configurações se clicar fora dele
 window.onclick = (e) => { if (!e.target.closest('#settings-container')) document.getElementById('settings-menu').style.display = 'none'; }
