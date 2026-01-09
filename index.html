@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Game - Palavra Secreta</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
@@ -11,20 +11,26 @@
 <body onload="carregarDados()">
 
     <div id="menu-inicial">
-        <div style="margin-bottom: 20px;">
-            <button class="btn-dif" onclick="setDificuldade(10, this)" style="padding:10px; cursor:pointer;">FÁCIL</button>
-            <button class="btn-dif" id="dif-normal" onclick="setDificuldade(6, this)" style="padding:10px; cursor:pointer; background:#c9b458; color:#ececec;">NORMAL</button>
-            <button class="btn-dif" onclick="setDificuldade(4, this)" style="padding:10px; cursor:pointer;">DIFÍCIL</button>
+        <div class="menu-card">
+            <h1 class="menu-title">PALAVRA<br><span>SECRETA</span></h1>
+            
+            <p style="font-size: 0.7rem; font-weight: bold; color: #888; margin-bottom: 5px; text-transform: uppercase;">Dificuldade</p>
+            <div class="dificuldade-selector">
+                <button class="btn-dif" id="dif-facil" onclick="setDificuldade(10, this)">FÁCIL</button>
+                <button class="btn-dif active" id="dif-normal" onclick="setDificuldade(6, this)">NORMAL</button>
+                <button class="btn-dif" id="dif-dificil" onclick="setDificuldade(4, this)">DIFÍCIL</button>
+            </div>
+
+            <button class="btn-jogar" onclick="startGame()">JOGAR AGORA</button>
         </div>
-        <button onclick="startGame()" style="padding:15px 40px; background: #c9b458; color:#ececec; border:none; border-radius:8px; cursor:pointer; font-size:1.2rem;">JOGAR</button>
     </div>
 
     <div id="modal-confirm">
         <div class="modal-content">
-            <h3>Novo Jogo</h3>
-            <p>Isso limpará seu histórico, pontos e combo!</p>
+            <h3 id="modal-title">Novo Jogo</h3>
+            <p id="modal-text">Isso limpará seu histórico, pontos e combo!</p>
             <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-                <button onclick="confirmarReset()" style="background: #c9b458; color:#ececec; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Novo Jogo</button>
+                <button id="modal-confirm-btn" onclick="confirmarReset()" style="background: #c9b458; color:#ececec; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Confirmar</button>
                 <button onclick="fecharModal()" style="padding:10px 20px; border:none; border-radius:5px; cursor:pointer; background:#d1d1d1;">Cancelar</button>
             </div>
         </div>
@@ -40,7 +46,7 @@
             <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; padding:0;">⚙️</button>
             <div id="settings-menu">
                 <button onclick="abrirModalReset()"><h3>🔄 Novo Jogo</h3></button>
-                <button onclick="voltarAoMenu()"><h3>⬅️ Menu Inicial</h3></button>
+                <button onclick="abrirModalVoltar()"><h3>⬅️ Menu Inicial</h3></button>
             </div>
         </div>
     </div>
@@ -49,12 +55,10 @@
 
     <div class="game-wrapper">
         <div id="game-board"></div>
-
         <div class="final-actions">
             <button id="btn-next" class="btn-final" style="background:var(--cor-correta);" onclick="proximaPalavra()">PRÓXIMA PALAVRA</button>
             <button id="btn-lose-menu" class="btn-final" style="background:var(--cor-perigo);" onclick="voltarAoMenu()">VOLTAR AO MENU</button>
         </div>
-
         <div id="historico-lateral">
             <h3 style="margin-top:0; font-size:0.9rem; text-align:center; border-bottom:1px solid #d1d1d1;">HISTÓRICO</h3>
             <div id="lista-historico"></div>
