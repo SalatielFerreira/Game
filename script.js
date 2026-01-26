@@ -157,7 +157,7 @@ const listaPalavras = [
 let palavraSecreta = "", tentativaAtual = 0, letraAtual = 0, palpiteAtual = "";
 let tempoSegundos = 0, startTime = null, intervaloTimer, jogoAtivo = false, maxTentativas = 6, scoreTotal = 0, acertosSeguidos = 0;
 
-// Elementos DOM frequentemente usados
+// Elementos DOM frequentemente usados (cache de seleções)
 const scoreDisplay = document.getElementById('score');
 const streakDisplay = document.getElementById('streak');
 const listaHistorico = document.getElementById('lista-historico');
@@ -222,7 +222,7 @@ function carregarDados() {
             tempoSegundos = salvo.tempoSegundos; 
             jogoAtivo = salvo.jogoAtivo;
             
-            gameBoard.innerHTML = salvo.tabuleiroHTML;
+            gameBoard.innerHTML = salvo.tabuleiroHTML; // Restaura o HTML do tabuleiro
             
             // Reatribui eventos de clique após recarregar HTML do tabuleiro
             document.querySelectorAll('.tile').forEach(tile => { 
@@ -243,11 +243,12 @@ function carregarDados() {
             }
 
             atualizarDestaque();
+            // Lógica ajustada para mostrar botões finais após carregamento
             if (!jogoAtivo) {
-                 // Verifica se houve vitória ou derrota para mostrar os botões finais
-                const lastRow = gameBoard.children[tentativaAtual > 0 ? tentativaAtual - 1 : 0]; // Pega a última linha tentada
-                const hasCorrectTiles = lastRow && lastRow.querySelector('.correct'); // Verifica se há tiles corretos na última tentativa
-                mostrarBotoesFinais(hasCorrectTiles); // Assume vitória se houver tiles corretos na última tentativa
+                 // Se o jogo não está ativo, a rodada anterior já terminou.
+                 // Verificamos se o palpite final resultou em vitória.
+                 const foiVitoriaSalva = (salvo.palpiteAtual === salvo.palavraSecreta);
+                 mostrarBotoesFinais(foiVitoriaSalva);
             }
         }
     }
@@ -325,7 +326,10 @@ function lidarComClique(t) {
     const tiles = row.children;
 
     if (t === "Apagar") { 
-        if (letraAtual > 0) letraAtual--; 
+        // Move o cursor para trás e apaga, ou apenas apaga se já estiver na 1ª posição
+        if (letraAtual > 0 && tiles[letraAtual].innerText === "") {
+            letraAtual--;
+        }
         tiles[letraAtual].innerText = ""; 
     } else if (t === "Enviar") {
         let p = ""; 
@@ -484,6 +488,7 @@ function sincronizarTeclado() {
     });
 
     // Percorre todos os tiles no tabuleiro para aplicar as cores no teclado
+    // Garante que as cores do teclado refletem o estado atual do jogo
     document.querySelectorAll('.tile').forEach(t => { 
         const letter = t.innerText;
         if (letter) { // Apenas se o tile tiver uma letra
@@ -499,12 +504,14 @@ function atualizarTecla(l, c) {
     if (!b) return; 
     
     // Lógica para priorizar as cores: correct > present > absent
+    // Uma letra 'correct' (verde) sempre tem prioridade
+    // Uma letra 'present' (amarela) tem prioridade sobre 'absent' (cinza)
     if (c === 'correct') {
-        b.className = 'key correct'; // Sempre sobrescreve
+        b.className = 'key correct'; // Sempre sobrescreve para verde
     } else if (c === 'present' && !b.classList.contains('correct')) {
-        b.className = 'key present'; // Sobrescreve se não for 'correct'
+        b.className = 'key present'; // Sobrescreve para amarelo se não for verde
     } else if (c === 'absent' && !b.classList.contains('correct') && !b.classList.contains('present')) {
-        b.className = 'key absent'; // Sobrescreve se não for 'correct' nem 'present'
+        b.className = 'key absent'; // Sobrescreve para cinza se não for verde nem amarelo
     }
 }
 
@@ -553,7 +560,7 @@ function setDificuldade(t, el) {
 function abrirModalReset() { 
     modalTitle.innerText = "Novo Jogo"; 
     modalText.innerText = "Isso limpará seu histórico, pontos e combo!"; 
-    modalConfirmBtn.onclick = confirmarReset; 
+    modalConfirmBtn.onclick = confirmarReset; // Atribui a função ao botão
     modalConfirm.style.display = 'flex'; 
     toggleSettings(); 
 }
@@ -565,7 +572,7 @@ function abrirModalVoltar() {
     } 
     modalTitle.innerText = "Voltar ao Menu"; 
     modalText.innerText = "Você perderá o progresso da rodada atual!"; 
-    modalConfirmBtn.onclick = voltarAoMenu; 
+    modalConfirmBtn.onclick = voltarAoMenu; // Atribui a função ao botão
     modalConfirm.style.display = 'flex'; 
     toggleSettings(); 
 }
@@ -596,6 +603,7 @@ function toggleSettings() {
 
 // Fecha o menu de configurações se clicar fora dele
 window.onclick = (e) => { 
+    // Verifica se o clique não foi dentro do container de configurações e se o menu está visível
     if (!e.target.closest('#settings-container') && settingsMenu.style.display === 'block') {
         settingsMenu.style.display = 'none';
     }
@@ -608,8 +616,10 @@ document.addEventListener('keydown', (event) => {
     const key = event.key.toUpperCase();
     if (key === 'BACKSPACE') {
         lidarComClique("Apagar");
+        event.preventDefault(); // Impede que o navegador volte para a página anterior
     } else if (key === 'ENTER') {
         lidarComClique("Enviar");
+        event.preventDefault(); // Impede que o navegador execute ações padrão (como submeter formulário)
     } else if (key.length === 1 && /^[A-Z]$/.test(key)) {
         lidarComClique(key);
     }
