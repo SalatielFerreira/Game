@@ -6,6 +6,13 @@
     <title>Game - Palavra Secreta</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Configurações PWA / Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Palavra Secreta">
+    <meta name="theme-color" content="#c9b458"> <!-- Cor principal do seu tema -->
 </head>
 
 <body onload="carregarDados()">
@@ -30,7 +37,7 @@
             <h3 id="modal-title">Novo Jogo</h3>
             <p id="modal-text">Isso limpará seu histórico, pontos e combo!</p>
             <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-                <button id="modal-confirm-btn" onclick="confirmarReset()" style="background: #c9b458; color:#ececec; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Confirmar</button>
+                <button id="modal-confirm-btn" style="background: var(--cor-primaria); color:#ececec; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Confirmar</button>
                 <button onclick="fecharModal()" style="padding:10px 20px; border:none; border-radius:5px; cursor:pointer; background:#d1d1d1;">Cancelar</button>
             </div>
         </div>
@@ -43,7 +50,7 @@
             <div>🔥 <span id="streak">0</span></div>
         </div>
         <div id="settings-container">
-            <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; padding:0;">⚙️</button>
+            <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; padding:0; color:#333;">⚙️</button>
             <div id="settings-menu">
                 <button onclick="abrirModalReset()"><h3>🔄 Novo Jogo</h3></button>
                 <button onclick="abrirModalVoltar()"><h3>⬅️ Menu Inicial</h3></button>
@@ -68,5 +75,19 @@
     <div id="keyboard"></div>
 
     <script src="script.js"></script>
+    <script>
+        // Registro do Service Worker para PWA (para funcionar offline e ser instalável)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Falha ao registrar ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
