@@ -4,7 +4,7 @@
     --cor-existe: #c9b458;
     --cor-ausente: #787c7e;
     --cor-borda: #ececec;
-    --cor-tecla: rgba(255, 255, 255, 0.2);
+    --cor-tecla: rgba(255, 255, 255, 0.12); /* Ajustado para ser mais visível */
     --cor-perigo: #dc3545;
     --cor-selecionado: #333; 
     --cor-primaria: #c9b458;
@@ -22,7 +22,7 @@ body {
     background-attachment: fixed;
     background-size: cover; 
     min-height: 100vh;
-    padding-bottom: 250px; 
+    padding-bottom: 250px; /* Espaço para o teclado */
     box-sizing: border-box;
     color: #333;
 }
@@ -50,7 +50,7 @@ body {
     text-align: center;
     width: 85%;
     max-width: 380px;
-    max-height: 90vh; 
+    max-height: 90vh; /* Para caber em telas menores */
     border: 1px solid rgba(255,255,255,0.3);
     box-sizing: border-box;
     display: flex;
@@ -125,13 +125,45 @@ body {
 }
 
 #settings-container { position: relative; display: flex; align-items: center; }
-#settings-menu { display: none; position: absolute; top: 45px; right: 0; background: #ececec; border: 1px solid gray; width: 160px; z-index: 150; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; } /* Adicionado border-radius e overflow */
-#settings-menu button { width: 100%; padding: 12px; text-align: left; cursor: pointer; border: none; border-bottom: 1px solid #e0e0e0; background: #ececec; color: #333; }
+#settings-menu { 
+    display: none; 
+    position: absolute; 
+    top: 45px; 
+    right: 0; 
+    background: #ececec; 
+    border: 1px solid gray; 
+    width: 160px; 
+    z-index: 150; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+    border-radius: 8px; 
+    overflow: hidden; /* Para garantir que as bordas arredondadas sejam aplicadas corretamente */
+}
+#settings-menu button { 
+    width: 100%; 
+    padding: 12px; 
+    text-align: left; 
+    cursor: pointer; 
+    border: none; 
+    border-bottom: 1px solid #e0e0e0; 
+    background: #ececec; 
+    color: #333; 
+}
 #settings-menu button:last-child { border-bottom: none; } /* Remove borda do último botão */
 #settings-menu button:hover { background: #e0e0e0; } /* Efeito hover */
 
 
-#message { min-height: 0; margin: 10px 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 90%; max-width: 400px; transition: all 0.3s ease; }
+#message { 
+    min-height: 0; 
+    margin: 10px 0; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    width: 90%; 
+    max-width: 400px; 
+    transition: all 0.3s ease; 
+}
 .msg-status { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase; }
 .msg-palavra { font-size: 1rem; font-weight: 500; color: black; background: #ececec; padding: 4px 12px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
@@ -151,7 +183,20 @@ body {
 .absent { background-color: var(--cor-ausente) !important; color: white !important; border-color: var(--cor-ausente) !important; border-bottom-width: 2px !important; }
 
 .final-actions { display: flex; justify-content: center; width: 100%; margin-top: 20px; gap: 15px; }
-.btn-final { display: none; padding: 12px 25px; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+.btn-final { 
+    display: none; 
+    padding: 12px 25px; 
+    color: white; 
+    border: none; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    font-size: 0.9rem; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    transition: all 0.3s ease; 
+}
 .btn-final:hover { filter: brightness(1.1); transform: translateY(-2px); }
 .btn-final:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
@@ -183,8 +228,25 @@ body {
     } 
 }
 
-#modal-confirm { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); display: none; z-index: 2000; color: black; align-items: center; justify-content: center; }
-.modal-content { background: #ececec; padding: 25px; border-radius: 12px; text-align: center; max-width: 90%; box-shadow: 0 8px 16px rgba(0,0,0,0.3); } /* Adicionado max-width e sombra */
+#modal-confirm { 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100vh; 
+    background: rgba(0,0,0,0.5); 
+    display: none; 
+    z-index: 2000; 
+    color: black; 
+    align-items: center; 
+    justify-content: center; 
+}
+.modal-content { 
+    background: #ececec; 
+    padding: 25px; 
+    border-radius: 12px; 
+    text-align: center; 
+    max-width: 90%; 
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
+} /* Adicionado max-width e sombra */
 
 #keyboard { 
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -195,7 +257,8 @@ body {
 }
 .kb-row { display: flex; justify-content: center; gap: 6px; }
 .key { 
-    padding: 15px 5px; background: rgba(255, 255, 255, 0.12); color: white; border: none; 
+    padding: 15px 5px; background: var(--cor-tecla); /* Usando a variável */
+    color: white; border: none; 
     border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; flex: 1; 
     text-transform: uppercase; transition: all 0.1s ease; /* Adicionado transição */
 }
