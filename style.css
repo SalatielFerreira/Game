@@ -17,7 +17,7 @@ body {
     align-items: center;
     margin: 0;
     overflow-x: hidden;
-    background-image: url('fundo.png');
+    background-image: url('fundo.png'); /* Caminho relativo */
     background-position: center center;
     background-attachment: fixed;
     background-size: cover; 
@@ -30,7 +30,7 @@ body {
 #menu-inicial {
     position: fixed; 
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background-image: url('fundo.png'); 
+    background-image: url('fundo.png'); /* Caminho relativo */
     background-position: center; 
     background-size: cover;
     display: flex; 
@@ -125,8 +125,11 @@ body {
 }
 
 #settings-container { position: relative; display: flex; align-items: center; }
-#settings-menu { display: none; position: absolute; top: 45px; right: 0; background: #ececec; border: 3px solid gray; width: 160px; z-index: 150; box-shadow: 0 4px 8px black; }
-#settings-menu button { width: 100%; padding: 12px; text-align: left; cursor: pointer; border: none; border-bottom: 1px solid gray; background: #ececec; }
+#settings-menu { display: none; position: absolute; top: 45px; right: 0; background: #ececec; border: 1px solid gray; width: 160px; z-index: 150; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; } /* Adicionado border-radius e overflow */
+#settings-menu button { width: 100%; padding: 12px; text-align: left; cursor: pointer; border: none; border-bottom: 1px solid #e0e0e0; background: #ececec; color: #333; }
+#settings-menu button:last-child { border-bottom: none; } /* Remove borda do último botão */
+#settings-menu button:hover { background: #e0e0e0; } /* Efeito hover */
+
 
 #message { min-height: 0; margin: 10px 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 90%; max-width: 400px; transition: all 0.3s ease; }
 .msg-status { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase; }
@@ -149,26 +152,56 @@ body {
 
 .final-actions { display: flex; justify-content: center; width: 100%; margin-top: 20px; gap: 15px; }
 .btn-final { display: none; padding: 12px 25px; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+.btn-final:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.btn-final:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-.game-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; }
+
+.game-wrapper { 
+    position: relative; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    width: 100%; 
+    max-width: 800px; 
+    padding: 0 15px; /* Adicionado padding para melhor espaçamento em telas menores */
+    box-sizing: border-box;
+}
+
 #historico-lateral {
     position: absolute; right: -200px; width: 180px; background: #ececec;
     border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px;
-    max-height: 400px; overflow-y: auto; box-shadow: 0 4px 6px black;
+    max-height: 400px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Sombra mais suave */
+    box-sizing: border-box; /* Adicionado box-sizing */
 }
-@media (max-width: 1100px) { #historico-lateral { position: static; width: 100%; max-width: 180px; margin-top: 20px; order: 3; } }
+@media (max-width: 1100px) { 
+    #historico-lateral { 
+        position: static; 
+        width: calc(100% - 30px); /* Ajustado para pegar a largura total com padding */
+        max-width: 300px; /* Um max-width um pouco maior pode ser bom para mobile */
+        margin-top: 20px; 
+        order: 3; /* Coloca o histórico abaixo do tabuleiro em telas menores */
+    } 
+}
 
 #modal-confirm { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); display: none; z-index: 2000; color: black; align-items: center; justify-content: center; }
-.modal-content { background: #ececec; padding: 25px; border-radius: 12px; text-align: center; }
+.modal-content { background: #ececec; padding: 25px; border-radius: 12px; text-align: center; max-width: 90%; box-shadow: 0 8px 16px rgba(0,0,0,0.3); } /* Adicionado max-width e sombra */
 
 #keyboard { 
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     width: calc(100% - 30px); max-width: 500px; background: rgba(0, 0, 0, 0.75); 
     backdrop-filter: blur(10px); padding: 15px 5px; display: flex; flex-direction: column;
     gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); z-index: 50; border-radius: 20px;
+    box-sizing: border-box; /* Garante que o padding não aumente a largura total */
 }
 .kb-row { display: flex; justify-content: center; gap: 6px; }
-.key { padding: 15px 5px; background: rgba(255, 255, 255, 0.12); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; flex: 1; text-transform: uppercase; }
+.key { 
+    padding: 15px 5px; background: rgba(255, 255, 255, 0.12); color: white; border: none; 
+    border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; flex: 1; 
+    text-transform: uppercase; transition: all 0.1s ease; /* Adicionado transição */
+}
+.key:hover { background: rgba(255, 255, 255, 0.25); } /* Efeito hover */
+.key:active { transform: scale(0.95); } /* Efeito de clique */
+
 .key.wide { flex: 1.8; }
 .key.correct { background-color: var(--cor-correta) !important; }
 .key.present { background-color: var(--cor-existe) !important; }
@@ -176,3 +209,31 @@ body {
 .hist-item { font-size: 0.8rem; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #d1d1d1; }
 .hist-vitoria { color: var(--cor-correta); font-weight: bold; }
 .hist-derrota { color: var(--cor-perigo); font-weight: bold; }
+
+/* Media query para telas menores para ajustar o tamanho dos tiles */
+@media (max-width: 480px) {
+    .tile {
+        width: 45px; /* Reduz o tamanho dos tiles */
+        height: 45px;
+        font-size: 1.5rem;
+    }
+    #game-board {
+        grid-gap: 3px; /* Reduz o espaçamento entre os tiles */
+    }
+    .row {
+        grid-gap: 3px;
+    }
+    .key {
+        font-size: 0.75rem; /* Reduz o tamanho da fonte das teclas */
+        padding: 12px 3px;
+    }
+    #keyboard {
+        bottom: 10px; /* Posiciona o teclado um pouco mais acima */
+        padding: 10px 3px;
+        gap: 5px;
+    }
+    .btn-final {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+}
