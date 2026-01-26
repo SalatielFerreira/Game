@@ -1,0 +1,27 @@
+{
+    "name": "Palavra Secreta Game",
+    "short_name": "Palavra Secreta",
+    "description": "Um divertido jogo de adivinhar palavras, inspirado no Wordle.",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#c9b458",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "logo.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "apple touch icon"
+        }
+    ]
+}
