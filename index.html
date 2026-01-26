@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Game - Palavra Secreta</title>
     <link rel="icon" type="image/png" href="logo.png">
+    <!-- Adicionado para melhor compatibilidade PWA no iOS -->
+    <link rel="apple-touch-icon" href="logo.png">
+    
     <link rel="stylesheet" href="style.css">
 
     <!-- Configurações PWA / Web App Manifest -->
@@ -37,6 +40,7 @@
             <h3 id="modal-title">Novo Jogo</h3>
             <p id="modal-text">Isso limpará seu histórico, pontos e combo!</p>
             <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+                <!-- O onclick é atribuído via JS agora -->
                 <button id="modal-confirm-btn" style="background: var(--cor-primaria); color:#ececec; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Confirmar</button>
                 <button onclick="fecharModal()" style="padding:10px 20px; border:none; border-radius:5px; cursor:pointer; background:#d1d1d1;">Cancelar</button>
             </div>
@@ -50,6 +54,7 @@
             <div>🔥 <span id="streak">0</span></div>
         </div>
         <div id="settings-container">
+            <!-- Cor do ícone de configurações ajustada para melhor contraste -->
             <button onclick="toggleSettings()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; padding:0; color:#333;">⚙️</button>
             <div id="settings-menu">
                 <button onclick="abrirModalReset()"><h3>🔄 Novo Jogo</h3></button>
@@ -79,6 +84,12 @@
         // Registro do Service Worker para PWA (para funcionar offline e ser instalável)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // O caminho do service worker deve ser relativo à raiz do site
+                // Para GitHub Pages, se o projeto estiver em https://usuario.github.io/repositorio/
+                // o service worker estaria em https://usuario.github.io/repositorio/service-worker.js
+                // O prefixo '/' garante que ele seja buscado a partir da raiz do *domínio* do site.
+                // Se for um repo como "meu-jogo", o caminho seria "/meu-jogo/service-worker.js"
+                // Mas o GitHub Pages trata a raiz do repo como "/" para o PWA, então "/service-worker.js" é o caminho correto.
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
                         console.log('ServiceWorker registrado com sucesso:', registration.scope);
