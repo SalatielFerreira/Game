@@ -2,7 +2,7 @@
     "name": "Palavra Secreta Game",
     "short_name": "Palavra Secreta",
     "description": "Um divertido jogo de adivinhar palavras, inspirado no Wordle.",
-    "start_url": "./index.html",
+    "start_url": "/", 
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#c9b458",
